@@ -1,11 +1,14 @@
 package com.example.login_signup_app.ui.signup
 
-import androidx.lifecycle.*
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.LiveData
+import com.example.login_signup_app.LoginApp
 import com.example.login_signup_app.data.model.User
 import com.example.login_signup_app.data.repository.UserRepository
 import kotlinx.coroutines.launch
-import androidx.lifecycle.ViewModel
-
 
 class SignupViewModel(private val repository: UserRepository) : ViewModel() {
 
@@ -25,7 +28,18 @@ class SignupViewModel(private val repository: UserRepository) : ViewModel() {
                     _signupResult.postValue(true)
                 }
             } catch (e: Exception) {
-                _errorMessage.postValue(e.message)
+                _errorMessage.postValue("Signup failed: ${e.message}")
+            }
+        }
+    }
+
+    companion object {
+        fun createFactory(application: LoginApp): ViewModelProvider.Factory {
+            return object : ViewModelProvider.Factory {
+                @Suppress("UNCHECKED_CAST")
+                override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                    return SignupViewModel(application.userRepository) as T
+                }
             }
         }
     }

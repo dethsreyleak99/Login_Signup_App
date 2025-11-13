@@ -1,4 +1,4 @@
-package com.example.login_signup_app.ui.login
+package com.example.login_signup_app.ui.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -6,35 +6,39 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.LiveData
 import com.example.login_signup_app.LoginApp
+import com.example.login_signup_app.data.model.User
 import com.example.login_signup_app.data.repository.UserRepository
 import kotlinx.coroutines.launch
 
-class LoginViewModel(private val repository: UserRepository) : ViewModel() {
+class HomeViewModel(private val repository: UserRepository) : ViewModel() {
 
-    private val _loginResult = MutableLiveData<Boolean>()
-    val loginResult: LiveData<Boolean> get() = _loginResult
+    private val _userData = MutableLiveData<User?>()
+    val userData: LiveData<User?> get() = _userData
 
     private val _isLoading = MutableLiveData<Boolean>()
     val isLoading: LiveData<Boolean> get() = _isLoading
 
-    private val _errorMessage = MutableLiveData<String>()
-    val errorMessage: LiveData<String> get() = _errorMessage
-
-    fun login(email: String, password: String) {
-        _isLoading.value = true
+    fun loadUserData() {
         viewModelScope.launch {
+            _isLoading.value = true
             try {
-                val user = repository.login(email, password)
-                _loginResult.postValue(user != null)
-                if (user == null) {
-                    _errorMessage.postValue("Invalid email or password")
-                }
+                // For demo - in real app, get actual logged-in user
+                _userData.value = User(
+                    id = 1,
+                    username = "John Doe",
+                    email = "john@example.com",
+                    password = ""
+                )
             } catch (e: Exception) {
-                _errorMessage.postValue("Login failed: ${e.message}")
+                // Handle error
             } finally {
-                _isLoading.postValue(false)
+                _isLoading.value = false
             }
         }
+    }
+
+    fun logout() {
+        _userData.value = null
     }
 
     companion object {
@@ -42,7 +46,7 @@ class LoginViewModel(private val repository: UserRepository) : ViewModel() {
             return object : ViewModelProvider.Factory {
                 @Suppress("UNCHECKED_CAST")
                 override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                    return LoginViewModel(application.userRepository) as T
+                    return HomeViewModel(application.userRepository) as T
                 }
             }
         }
