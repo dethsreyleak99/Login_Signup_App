@@ -13,6 +13,15 @@
         android:orientation="vertical"
         android:gravity="center">
 
+        <!-- Loading Progress Bar -->
+        <ProgressBar
+            android:id="@+id/progressBar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:visibility="gone"
+            android:layout_marginBottom="16dp" />
+
         <!-- Logo/Header -->
         <ImageView
             android:layout_width="120dp"
@@ -51,7 +60,9 @@
             app:boxCornerRadiusBottomStart="12dp"
             app:boxCornerRadiusBottomEnd="12dp"
             app:boxStrokeColor="@color/primary_color"
-            app:hintTextColor="@color/hint_color">
+            app:hintTextColor="@color/hint_color"
+            app:startIconDrawable="@drawable/ic_email"
+            app:startIconTint="@color/primary_color">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/etEmail"
@@ -68,14 +79,16 @@
             android:id="@+id/tilPassword"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="24dp"
+            android:layout_marginBottom="16dp"
             app:boxCornerRadiusTopStart="12dp"
             app:boxCornerRadiusTopEnd="12dp"
             app:boxCornerRadiusBottomStart="12dp"
             app:boxCornerRadiusBottomEnd="12dp"
             app:boxStrokeColor="@color/primary_color"
             app:hintTextColor="@color/hint_color"
-            app:endIconMode="password_toggle">
+            app:endIconMode="password_toggle"
+            app:startIconDrawable="@drawable/ic_password"
+            app:startIconTint="@color/primary_color">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/etPassword"
@@ -87,41 +100,35 @@
 
         </com.google.android.material.textfield.TextInputLayout>
 
-        <!-- Add this after password input layout -->
+        <!-- Remember Me & Forgot Password Row -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:gravity="center_vertical"
             android:layout_marginBottom="24dp">
 
-            <CheckBox
+            <com.google.android.material.checkbox.MaterialCheckBox
                 android:id="@+id/cbRememberMe"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/remember_me"
-                android:layout_weight="1" />
+                android:layout_weight="1"
+                app:buttonTint="@color/primary_color" />
 
             <TextView
                 android:id="@+id/tvForgotPassword"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/forgot_password"
-                android:textColor="@color/primary_color"
                 android:textSize="14sp"
+                android:textColor="@color/primary_color"
+                android:padding="8dp"
                 android:clickable="true"
                 android:focusable="true"
                 android:background="?attr/selectableItemBackground" />
 
         </LinearLayout>
 
-        <!-- Add ProgressBar -->
-        <ProgressBar
-            android:id="@+id/progressBar"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:visibility="gone" />
         <!-- Login Button -->
         <Button
             android:id="@+id/btnLogin"
@@ -132,6 +139,13 @@
             android:textStyle="bold"
             android:backgroundTint="@color/primary_color"
             android:textColor="@color/white"
+            android:layout_marginBottom="24dp" />
+
+        <!-- Social Login Section -->
+        <include
+            layout="@layout/social_login_section"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             android:layout_marginBottom="24dp" />
 
         <!-- Sign up link -->
