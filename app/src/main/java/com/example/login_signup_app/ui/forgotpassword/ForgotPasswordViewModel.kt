@@ -1,4 +1,4 @@
-package com.example.login_signup_app.ui.login
+package com.example.login_signup_app.ui.forgotpassword
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -7,15 +7,13 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.LiveData
 import com.example.login_signup_app.LoginApp
 import com.example.login_signup_app.data.repository.UserRepository
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-class LoginViewModel(
-    private val repository: UserRepository,
-    private val app: LoginApp
-) : ViewModel() {
+class ForgotPasswordViewModel(private val repository: UserRepository) : ViewModel() {
 
-    private val _loginResult = MutableLiveData<Boolean>()
-    val loginResult: LiveData<Boolean> get() = _loginResult
+    private val _resetResult = MutableLiveData<Boolean>()
+    val resetResult: LiveData<Boolean> get() = _resetResult
 
     private val _isLoading = MutableLiveData<Boolean>()
     val isLoading: LiveData<Boolean> get() = _isLoading
@@ -23,22 +21,26 @@ class LoginViewModel(
     private val _errorMessage = MutableLiveData<String>()
     val errorMessage: LiveData<String> get() = _errorMessage
 
-    fun login(email: String, password: String, rememberMe: Boolean = false) {
+    fun sendPasswordReset(email: String) {
         _isLoading.value = true
         viewModelScope.launch {
             try {
-                val user = repository.login(email, password)
-                if (user != null) {
-                    // Save user session
-                    app.sessionManager.saveUserSession(user, rememberMe)
-                    _loginResult.postValue(true)
+                // Simulate API call delay
+                delay(2000)
+
+                // Check if email exists
+                val userExists = repository.checkEmailExists(email)
+                if (userExists) {
+                    // In a real app, send actual email here
+                    // For demo, we'll just simulate success
+                    _resetResult.postValue(true)
                 } else {
-                    _errorMessage.postValue("Invalid email or password")
-                    _loginResult.postValue(false)
+                    _errorMessage.postValue("No account found with this email")
+                    _resetResult.postValue(false)
                 }
             } catch (e: Exception) {
-                _errorMessage.postValue("Login failed: ${e.message}")
-                _loginResult.postValue(false)
+                _errorMessage.postValue("Failed to send reset email: ${e.message}")
+                _resetResult.postValue(false)
             } finally {
                 _isLoading.postValue(false)
             }
@@ -50,7 +52,7 @@ class LoginViewModel(
             return object : ViewModelProvider.Factory {
                 @Suppress("UNCHECKED_CAST")
                 override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                    return LoginViewModel(application.userRepository, application) as T
+                    return ForgotPasswordViewModel(application.userRepository) as T
                 }
             }
         }

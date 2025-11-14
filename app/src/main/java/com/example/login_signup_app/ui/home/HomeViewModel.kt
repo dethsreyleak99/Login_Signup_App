@@ -10,7 +10,10 @@ import com.example.login_signup_app.data.model.User
 import com.example.login_signup_app.data.repository.UserRepository
 import kotlinx.coroutines.launch
 
-class HomeViewModel(private val repository: UserRepository) : ViewModel() {
+class HomeViewModel(
+    private val repository: UserRepository,
+    private val app: LoginApp
+) : ViewModel() {
 
     private val _userData = MutableLiveData<User?>()
     val userData: LiveData<User?> get() = _userData
@@ -22,15 +25,18 @@ class HomeViewModel(private val repository: UserRepository) : ViewModel() {
         viewModelScope.launch {
             _isLoading.value = true
             try {
-                // For demo - in real app, get actual logged-in user
-                _userData.value = User(
-                    id = 1,
-                    username = "John Doe",
-                    email = "john@example.com",
-                    password = ""
-                )
+                // Get actual logged-in user from session
+                val currentUser = app.sessionManager.getCurrentUser()
+                if (currentUser != null) {
+                    // Fetch fresh data from database
+                    val freshUser = repository.getUserByEmail(currentUser.email)
+                    _userData.value = freshUser
+                } else {
+                    _userData.value = null
+                }
             } catch (e: Exception) {
-                // Handle error
+                // Fallback to session data
+                _userData.value = app.sessionManager.getCurrentUser()
             } finally {
                 _isLoading.value = false
             }
@@ -38,7 +44,23 @@ class HomeViewModel(private val repository: UserRepository) : ViewModel() {
     }
 
     fun logout() {
+        app.sessionManager.clearSession()
         _userData.value = null
+    }
+
+    fun updateUsername(newUsername: String) {
+        viewModelScope.launch {
+            try {
+                val currentUser = _userData.value
+                currentUser?.let { user ->
+                    // In a real app, you would update in database
+                    app.sessionManager.updateUsername(newUsername)
+                    _userData.value = user.copy(username = newUsername)
+                }
+            } catch (e: Exception) {
+                // Handle error
+            }
+        }
     }
 
     companion object {
@@ -46,7 +68,7 @@ class HomeViewModel(private val repository: UserRepository) : ViewModel() {
             return object : ViewModelProvider.Factory {
                 @Suppress("UNCHECKED_CAST")
                 override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                    return HomeViewModel(application.userRepository) as T
+                    return HomeViewModel(application.userRepository, application) as T
                 }
             }
         }

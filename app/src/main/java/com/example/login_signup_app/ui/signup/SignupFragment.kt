@@ -44,6 +44,10 @@ class SignupFragment : Fragment() {
                 viewModel.signup(username, email, password)
             }
         }
+
+        binding.tvLoginLink.setOnClickListener {
+            findNavController().navigate(com.example.login_signup_app.R.id.action_signupFragment_to_loginFragment)
+        }
     }
 
     private fun setupObservers() {

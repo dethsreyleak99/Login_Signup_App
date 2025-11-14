@@ -21,12 +21,17 @@ class MainActivity : AppCompatActivity() {
             .findFragmentById(R.id.nav_host_fragment_container) as NavHostFragment
         val navController = navHostFragment.navController
 
+        // Check if user is already logged in
+        val app = application as LoginApp
+        if (app.sessionManager.isLoggedIn()) {
+            navController.navigate(R.id.homeFragment)
+        }
+
         // Configure AppBar with nav graph
         val appBarConfiguration = AppBarConfiguration(navController.graph)
         setupActionBarWithNavController(navController, appBarConfiguration)
     }
 
-    // Handle Up button
     override fun onSupportNavigateUp(): Boolean {
         val navHostFragment = supportFragmentManager
             .findFragmentById(R.id.nav_host_fragment_container) as NavHostFragment
