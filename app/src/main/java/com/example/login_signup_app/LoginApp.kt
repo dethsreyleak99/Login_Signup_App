@@ -8,10 +8,10 @@ import com.example.login_signup_app.data.repository.UserRepository
 class LoginApp : Application() {
     val database by lazy { AppDatabase.getInstance(this) }
     val userRepository by lazy { UserRepository(database.userDao()) }
-    val sessionManager by lazy { SessionManager(this) }
+    lateinit var sessionManager: SessionManager
 
     override fun onCreate() {
         super.onCreate()
-        // Initialize any global components here
+        sessionManager = SessionManager(this)
     }
 }

@@ -11,7 +11,7 @@ import kotlinx.coroutines.launch
 
 class LoginViewModel(
     private val repository: UserRepository,
-    private val app: LoginApp
+    private val sessionManager: com.example.login_signup_app.data.local.SessionManager
 ) : ViewModel() {
 
     private val _loginResult = MutableLiveData<Boolean>()
@@ -23,14 +23,13 @@ class LoginViewModel(
     private val _errorMessage = MutableLiveData<String>()
     val errorMessage: LiveData<String> get() = _errorMessage
 
-    fun login(email: String, password: String, rememberMe: Boolean = false) {
+    fun login(email: String, password: String) {
         _isLoading.value = true
         viewModelScope.launch {
             try {
                 val user = repository.login(email, password)
                 if (user != null) {
-                    // Save user session
-                    app.sessionManager.saveUserSession(user, rememberMe)
+                    sessionManager.saveUserSession(user)
                     _loginResult.postValue(true)
                 } else {
                     _errorMessage.postValue("Invalid email or password")
@@ -50,7 +49,7 @@ class LoginViewModel(
             return object : ViewModelProvider.Factory {
                 @Suppress("UNCHECKED_CAST")
                 override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                    return LoginViewModel(application.userRepository, application) as T
+                    return LoginViewModel(application.userRepository, application.sessionManager) as T
                 }
             }
         }
