@@ -34,21 +34,27 @@ class LoginFragment : Fragment() {
 
         setupClickListeners()
         setupObservers()
+        checkExistingSession()
+        setupRememberMe()
     }
 
     private fun setupClickListeners() {
         binding.btnLogin.setOnClickListener {
             val email = binding.etEmail.text.toString()
             val password = binding.etPassword.text.toString()
+            val rememberMe = binding.cbRememberMe.isChecked
 
             if (validateInputs(email, password)) {
-                viewModel.login(email, password)
+                viewModel.login(email, password, rememberMe)
             }
         }
 
-        // Sign up text click
         binding.tvSignupLink.setOnClickListener {
             findNavController().navigate(com.example.login_signup_app.R.id.action_loginFragment_to_signupFragment)
+        }
+
+        binding.tvForgotPassword.setOnClickListener {
+            findNavController().navigate(com.example.login_signup_app.R.id.action_loginFragment_to_forgotPasswordFragment)
         }
     }
 
@@ -66,6 +72,25 @@ class LoginFragment : Fragment() {
         viewModel.isLoading.observe(viewLifecycleOwner) { isLoading ->
             binding.btnLogin.isEnabled = !isLoading
             binding.btnLogin.text = if (isLoading) "Logging in..." else "Login"
+            binding.progressBar.visibility = if (isLoading) View.VISIBLE else View.GONE
+        }
+    }
+
+    private fun checkExistingSession() {
+        val app = requireActivity().application as LoginApp
+        if (app.sessionManager.isLoggedIn()) {
+            findNavController().navigate(com.example.login_signup_app.R.id.action_loginFragment_to_homeFragment)
+        }
+    }
+
+    private fun setupRememberMe() {
+        val app = requireActivity().application as LoginApp
+        if (app.sessionManager.shouldRememberMe()) {
+            val user = app.sessionManager.getCurrentUser()
+            user?.let {
+                binding.etEmail.setText(it.email)
+                binding.cbRememberMe.isChecked = true
+            }
         }
     }
 
